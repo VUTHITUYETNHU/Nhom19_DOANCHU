@@ -83,7 +83,7 @@ void choi_game() {
         }
         else {
             so_lan_sai++;
-            cout << "Ban da doan sai! Con " << (SO_LAN_DOAN_SAI_TOI_DA - so_lan_sai) << " lan nua.\n";
+            cout << "Sai roi con vo! Phai chiuuu! Con " << (SO_LAN_DOAN_SAI_TOI_DA - so_lan_sai) << " lan nua.\n";
         }
 
         ve_nguoi_treo_co(so_lan_sai);
