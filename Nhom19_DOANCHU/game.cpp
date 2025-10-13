@@ -74,9 +74,6 @@ void khoi_tao_game(vector<vector<string>>& danh_sach_tu, string& tu_bi_mat,
     cout << "Chon che do choi:\n1. 1 nguoi (tu trong thu vien)\n2. 2 nguoi (nguoi 1 nhap tu bi mat)\nLua chon: ";
     char chon;
     cin >> chon;
-	while (chon != 1 && chon != '2')
-        cin >> chon;
-
 
     if (chon == '2') {
         che_do_hai_nguoi = true;
@@ -87,7 +84,7 @@ void khoi_tao_game(vector<vector<string>>& danh_sach_tu, string& tu_bi_mat,
         for (char& c : tu_thuong) c = tolower(c);
         da_doan.assign(tu_bi_mat.length(), '_');
         system("cls"); // xóa màn hình để người chơi 2 không nhìn thấy
-        cout << "Bat dau choi nao!\n";
+        cout << "Bat dau choi!\n";
         return;
     }
 
@@ -176,7 +173,7 @@ void choi_game() {
                 if (chon == 'y' || chon == 'Y') {
                     for (int i = 0; i < tu_bi_mat.length(); ++i) {
                         if (da_doan[i] == '_') {
-                            cout << "Goi y: Tu nay co chua chu cai '" << tu_thuong[i] << "'\n";
+                            cout << "💡 Goi y: Tu nay co chua chu cai '" << tu_thuong[i] << "'\n";
                             break;
                         }
                     }
@@ -197,9 +194,9 @@ void choi_game() {
             diem_so -= 5;
             so_van_thua++;
         }
-		diem_so = max(diem_so, 0);
+
         cout << "\n===== THONG KE =====\n";
-        cout << "Diem hien tai: " <<diem_so<< endl;
+        cout << "Diem hien tai: " << diem_so << endl;
         cout << "So van thang: " << so_van_thang << endl;
         cout << "So van thua: " << so_van_thua << endl;
 
