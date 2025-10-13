@@ -79,7 +79,7 @@ void choi_game() {
         }
 
         if (xu_ly_doan(ky_tu_doan, tu_thuong, da_doan, so_chu_dung)) {
-            cout << "Ban da doan dung!\n";
+            cout << "Ban da doan dung Chuc mung con vo!\n";
         }
         else {
             so_lan_sai++;
