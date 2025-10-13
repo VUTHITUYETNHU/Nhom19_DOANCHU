@@ -1,0 +1,43 @@
+# Chu de 1: May tinh
+Computer
+Monitor
+Keyboard
+Mouse
+Processor
+Memory
+Hard drive
+Software
+Hardware
+Operating system
+Program
+Application
+Network
+Internet
+Download
+Upload
+File
+Folder
+Data
+Database
+
+# Chu de 2: Dien tu
+Electronics
+Telecommunications
+Circuit
+Resistor
+Capacitor
+Inductor
+Transistor
+Diode
+Microcontroller
+Signal
+Frequency
+Antenna
+Modulation
+Amplifier
+Oscillator
+Bandwidth
+Transmission
+Receiver
+Sensor
+Wireless

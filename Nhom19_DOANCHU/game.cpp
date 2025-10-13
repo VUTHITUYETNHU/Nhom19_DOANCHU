@@ -190,7 +190,7 @@ void choi_game() {
             so_van_thang++;
         }
         else {
-            cout << "\n Ban da thua. Tu dung la: " << tu_bi_mat << "\n";
+            cout << "\n Ban da thua. Phai chiu Tu dung la: " << tu_bi_mat << "\n";
             diem_so -= 5;
             so_van_thua++;
         }
