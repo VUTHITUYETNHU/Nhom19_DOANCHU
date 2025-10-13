@@ -74,7 +74,7 @@ void choi_game() {
         ky_tu_doan = tolower(ky_tu_doan);
 
         if (S.find(ky_tu_doan) == string::npos) {
-            cout << "Ky tu da duoc doan, vui long chon ky tu khac!\n";
+            cout << "Ky tu khong hop le\n";
             continue;
         }
 
