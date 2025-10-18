@@ -1,3 +1,5 @@
+#define NOMINMAX 
+
 #include "game.h"
 #include "ve_nguoi.h"
 #include <iostream>
@@ -11,15 +13,19 @@
 #include <thread>
 #include <chrono>
 #include <mmsystem.h>
-#include <algorithm> // Để sử dụng std::max
+#include <algorithm> 
+#include <limits>
 
 #pragma comment(lib, "winmm.lib")
 using namespace std;
 
-// #define SO_LAN_DOAN_SAI_TOI_DA 6 - KHÔNG DÙNG NỮA VÌ GIÁ TRỊ THAY ĐỔI THEO ĐỘ KHÓ
-
-int diem_so = 0;
-int so_van_thang = 0, so_van_thua = 0;
+// =============== HÀM PHỤ TRỢ XỬ LÝ LỖI INPUT ===============
+void xu_ly_loi_input() {
+    if (cin.fail()) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
+}
 
 // =============== HÀM HIỆU ỨNG ===============
 void doiMau(int mau) {
@@ -80,18 +86,35 @@ vector<pair<string, vector<string>>> doc_tu_tu_file(const string& ten_file) {
     return danh_sach_tu;
 }
 
-// =============== HÀM CHỌN ĐỘ KHÓ MỚI ===============
+// =============== HÀM CHỌN ĐỘ KHÓ ===============
 string chon_do_kho() {
     doiMau(14);
     cout << "\n=== CHON DO KHO ===\n";
     doiMau(7);
-    cout << "1. De (Tu dai <= 6 ky tu, 0 lan goi y)\n";
-    cout << "2. Trung Binh (Tu dai 7-11 ky tu, 1 lan goi y)\n";
-    cout << "3. Kho (Tu dai >= 12 ky tu, 2 lan goi y)\n";
+    cout << "1. De (Tu dai <= 6 ky tu, 0 NGOI SAO HY VONG)\n";
+    cout << "2. Trung Binh (Tu dai 7-11 ky tu, 1 NGOI SAO HY VONG)\n";
+    cout << "3. Kho (Tu dai >= 12 ky tu, 2 NGOI SAO HY VONG)\n";
     cout << "Lua chon: ";
 
     char chon;
-    cin >> chon;
+
+    // Sử dụng vòng lặp an toàn để nhập input
+    while (true) {
+        if (!(cin >> chon)) {
+            xu_ly_loi_input();
+            doiMau(12);
+            cout << "Input khong hop le. Vui long nhap 1, 2, hoac 3: ";
+            doiMau(7);
+            continue;
+        }
+
+        if (chon == '1' || chon == '2' || chon == '3') break;
+
+        doiMau(12);
+        cout << "Lua chon khong hop le. Vui long nhap 1, 2, hoac 3: ";
+        doiMau(7);
+        xu_ly_loi_input();
+    }
 
     switch (chon) {
     case '1':
@@ -101,10 +124,11 @@ string chon_do_kho() {
     case '3':
         return "KHO";
     default:
+        // Mặc định chọn Trung Bình
         doiMau(12);
-        cout << "Lua chon khong hop le. Mac dinh chon De.\n";
+        cout << "Lua chon khong hop le. Mac dinh chon Trung Binh.\n";
         doiMau(7);
-        return "DE";
+        return "TRUNG BINH";
     }
 }
 
@@ -172,7 +196,24 @@ void khoi_tao_game(vector<pair<string, vector<string>>>& danh_sach_tu, string& t
     // BƯỚC 1: CHỌN CHẾ ĐỘ CHƠI
     cout << "\nChon che do choi:\n1. 1 nguoi (tu trong thu vien)\n2. 2 nguoi (nguoi 1 nhap tu bi mat)\nLua chon: ";
     char chon;
-    cin >> chon;
+
+    // Sử dụng vòng lặp an toàn để nhập input
+    while (true) {
+        if (!(cin >> chon)) {
+            xu_ly_loi_input();
+            doiMau(12);
+            cout << "Input khong hop le. Vui long nhap 1 hoac 2: ";
+            doiMau(7);
+            continue;
+        }
+
+        if (chon == '1' || chon == '2') break;
+
+        doiMau(12);
+        cout << "Lua chon khong hop le. Vui long nhap 1 hoac 2: ";
+        doiMau(7);
+        xu_ly_loi_input();
+    }
 
     if (chon == '2') {
         che_do_hai_nguoi = true;
@@ -218,11 +259,57 @@ void khoi_tao_game(vector<pair<string, vector<string>>>& danh_sach_tu, string& t
         n = 0;
     }
 
-    // BƯỚC 3: CHỌN TỪ DỰA TRÊN ĐỘ KHÓ
+    // BƯỚC 3: CHỌN TỪ DỰ TRÊN ĐỘ KHÓ
     tu_bi_mat = chon_tu_bi_mat(danh_sach_tu, n, do_kho_da_chon);
     tu_thuong = tu_bi_mat;
     for (char& c : tu_thuong) c = tolower(c);
     da_doan.assign(tu_bi_mat.length(), '_');
+}
+
+// =============== HÀM GỢI Ý: NGÔI SAO HY VỌNG ===============
+bool su_dung_ngoi_sao_hy_vong(const string& tu_bi_mat, const string& tu_thuong, string& da_doan, int& so_lan_goi_y_con_lai) {
+    // 1. Kiểm tra điều kiện sử dụng
+    if (so_lan_goi_y_con_lai <= 0) {
+        return false; // Không còn lượt gợi ý
+    }
+
+    doiMau(11);
+    cout << "[NGOI SAO HY VONG] Ban con " << so_lan_goi_y_con_lai << " lan. Nhap 'y' de dung: ";
+    doiMau(7);
+
+    // Khai báo biến chọn gợi ý cục bộ
+    char chon_goi_y;
+
+    // Xử lý nhập liệu an toàn
+    if (!(cin >> chon_goi_y)) {
+        xu_ly_loi_input();
+        return false; // Lỗi input, không dùng
+    }
+
+    // 2. Thực hiện gợi ý
+    if (chon_goi_y == 'y' || chon_goi_y == 'Y') {
+        so_lan_goi_y_con_lai--; // Giảm số lần gợi ý
+
+        // Khai báo biến kiểm tra việc tìm thấy ký tự gợi ý
+        bool da_tim_goi_y = false;
+
+        for (int i = 0; i < (int)tu_bi_mat.length(); ++i) {
+            // Chỉ gợi ý cho ký tự chưa đoán được
+            if (da_doan[i] == '_') {
+                doiMau(11);
+                cout << "Goi y: Tu nay co chua chu cai '" << tu_thuong[i] << "'\n";
+                doiMau(7);
+                da_tim_goi_y = true;
+                break;
+            }
+        }
+        if (da_tim_goi_y) {
+            cout << "(Ban con " << so_lan_goi_y_con_lai << " NGOI SAO HY VONG)\n";
+        }
+        return true; // Đã sử dụng và được gợi ý thành công
+    }
+
+    return false; // Người chơi chọn không dùng
 }
 
 // =============== HÀM CHƠI GAME CHÍNH ===============
@@ -240,7 +327,7 @@ void choi_game() {
         string do_kho;
         int so_lan_goi_y_toi_da = 0;
         int so_lan_goi_y_con_lai = 0;
-        int so_lan_sai_toi_da_hien_tai = 6; // Biến cục bộ để thay thế hằng số
+        int so_lan_sai_toi_da_hien_tai = 6;
 
         // GỌI HÀM KHỞI TẠO GAME VỚI BIẾN ĐỘ KHÓ
         khoi_tao_game(danh_sach_tu, tu_bi_mat, tu_thuong, da_doan, n, che_do_hai_nguoi, do_kho);
@@ -253,38 +340,50 @@ void choi_game() {
         char ky_tu_doan;
         string S = "a b c d e f g h i j k l m n o p q r s t u v w x y z";
 
-        // XÁC ĐỊNH SỐ LẦN GỢI Ý VÀ SỐ LẦN SAI TỐI ĐA DỰA TRÊN ĐỘ KHÓ ĐÃ CHỌN
+        // XÁC ĐỊNH SỐ LẦN GỢI Ý DỰ TRÊN ĐỘ KHÓ ĐÃ CHỌN
         int do_dai = (int)tu_bi_mat.length();
+
+        // SỐ LẦN SAI CỐ ĐỊNH LÀ 6 CHO MỌI ĐỘ KHÓ
+        so_lan_sai_toi_da_hien_tai = 6;
+
         if (do_kho == "DE") {
             so_lan_goi_y_toi_da = 0;
-            so_lan_sai_toi_da_hien_tai = 6; 
         }
         else if (do_kho == "TRUNG BINH") {
             so_lan_goi_y_toi_da = 1;
-            so_lan_sai_toi_da_hien_tai = 6;
         }
         else { // KHO
             so_lan_goi_y_toi_da = 2;
-            so_lan_sai_toi_da_hien_tai = 6;
         }
         so_lan_goi_y_con_lai = so_lan_goi_y_toi_da;
 
         // XUẤT RA THÔNG TIN ĐỘ KHÓ
         doiMau(14);
         cout << "\n* Do kho hien tai: " << do_kho << " (Tu dai " << do_dai << " chu cai)";
-        cout << " - Ban co " << so_lan_goi_y_toi_da << " lan goi y.";
+        cout << " - Ban co " << so_lan_goi_y_toi_da << " NGOI SAO HY VONG.";
         cout << " - Tong cong " << so_lan_sai_toi_da_hien_tai << " lan doan sai.\n";
         doiMau(7);
 
         ve_nguoi_treo_co(so_lan_sai);
 
-        // Sử dụng biến 'so_lan_sai_toi_da_hien_tai'
+        // Vòng lặp chính của trò chơi
         while (so_lan_sai < so_lan_sai_toi_da_hien_tai && so_chu_dung < tu_bi_mat.length()) {
             cout << "\nTu hien tai: ";
             hien_thi_tu_hien_tai(da_doan);
             cout << "Ky tu chua doan: " << S << endl;
+
+            // GỌI HÀM GỢI Ý RIÊNG (Ngôi Sao Hy Vọng) BẤT KỲ LÚC NÀO
+            if (su_dung_ngoi_sao_hy_vong(tu_bi_mat, tu_thuong, da_doan, so_lan_goi_y_con_lai)) {
+                continue; // Quay lại đầu vòng lặp để hiển thị trạng thái mới
+            }
+
+            // TIẾP TỤC ĐOÁN
             cout << "Hay doan mot chu cai: ";
-            cin >> ky_tu_doan;
+            // Xử lý nhập liệu an toàn
+            if (!(cin >> ky_tu_doan)) {
+                xu_ly_loi_input();
+                continue;
+            }
             ky_tu_doan = tolower(ky_tu_doan);
 
             if (ky_tu_doan < 'a' || ky_tu_doan > 'z') {
@@ -319,40 +418,6 @@ void choi_game() {
 
             for (char& c : S) if (c == ky_tu_doan) c = ' ';
             ve_nguoi_treo_co(so_lan_sai);
-
-            // ===== LOGIC GỢI Ý DỰA TRÊN ĐỘ KHÓ VÀ SỐ LẦN CÒN LẠI =====
-            if (sai_lien_tiep >= 3 && so_lan_goi_y_con_lai > 0) {
-                cout << "\nBan da doan sai 3 lan lien tiep. Ban co muon nhan goi y khong? (y/n): ";
-                char chon;
-                cin >> chon;
-
-
-                bool da_tim_goi_y = false;
-
-                if (chon == 'y' || chon == 'Y') {
-                    so_lan_goi_y_con_lai--; // Giảm số lần gợi ý
-
-                    for (int i = 0; i < (int)tu_bi_mat.length(); ++i) {
-                        if (da_doan[i] == '_') {
-                            doiMau(11);
-                            cout << "Goi y: Tu nay co chua chu cai '" << tu_thuong[i] << "'\n";
-                            doiMau(7);
-                            da_tim_goi_y = true;
-                            break;
-                        }
-                    }
-                    if (da_tim_goi_y) {
-                        cout << "(Ban con " << so_lan_goi_y_con_lai << " lan goi y)\n";
-                    }
-                }
-                sai_lien_tiep = 0;
-            }
-            else if (sai_lien_tiep >= 3 && so_lan_goi_y_con_lai == 0) {
-                doiMau(14);
-                cout << "\nBan da sai 3 lan lien tiep, nhung da het luot goi y.\n";
-                doiMau(7);
-                sai_lien_tiep = 0;
-            }
         }
 
         // ===== KẾT QUẢ =====
@@ -361,14 +426,12 @@ void choi_game() {
             amThanhThang();
             inChamCham("\nChuc mung! Tu dung la: " + tu_bi_mat, 30);
             doiMau(7);
-
         }
         else {
             doiMau(12);
             amThanhThua();
             inChamCham("\nBan da thua. Tu dung la: " + tu_bi_mat, 30);
             doiMau(7);
-
         }
 
         cout << "\nBan co muon choi lai khong? (y/n): ";
