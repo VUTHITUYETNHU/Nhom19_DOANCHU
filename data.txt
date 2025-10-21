@@ -5,10 +5,8 @@ Keyboard
 Mouse
 Processor
 Memory
-Hard drive
 Software
 Hardware
-Operating system
 Program
 Application
 Network
@@ -19,6 +17,8 @@ File
 Folder
 Data
 Database
+Cybersecurity
+Visualization
 
 # Chu de 2: Dien tu
 Electronics
@@ -41,3 +41,19 @@ Transmission
 Receiver
 Sensor
 Wireless
+Semiconductor
+Troubleshooting
+
+# Chu de 3: Khoa hoc
+science
+Experiment
+Research
+Hypothesis
+Theory
+Data
+Analysis
+observation
+Conclusion
+Variable
+Nanotechnology
+Superconductivity
