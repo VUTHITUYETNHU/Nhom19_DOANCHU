@@ -47,7 +47,55 @@ void amThanhThang() {
 void amThanhThua() {
     PlaySound(TEXT("lose.wav"), NULL, SND_FILENAME | SND_ASYNC);
 }
+// Hàm di chuyển con trỏ đến vị trí x, y trên màn hình console
+void gotoXY(int x, int y) {
+    COORD coord;
+    coord.X = x;
+    coord.Y = y;
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+}
+// Hàm hiệu ứng pháo hoa
+void hieu_ung_phao_hoa() {
+    // Không xóa màn hình ngay lập tức để giữ lại hình vẽ người treo cổ
 
+    srand(static_cast<unsigned int>(time(0))); // Khởi tạo seed ngẫu nhiên
+    auto startTime = chrono::steady_clock::now();
+
+    // Giả định kích thước cửa sổ console (có thể điều chỉnh)
+    const int consoleWidth = 80;
+    const int consoleHeight = 25;
+
+    // Vòng lặp pháo hoa trong 3 giây
+    while (chrono::steady_clock::now() - startTime < chrono::seconds(3)) {
+
+        // 1. Chọn màu ngẫu nhiên (chỉ các màu sáng)
+        int mau = 9 + (rand() % 7); // Từ 9 (Blue) đến 15 (White)
+        doiMau(mau);
+
+        // 2. Chọn vị trí ngẫu nhiên
+        int x = rand() % consoleWidth;
+        int y = rand() % consoleHeight;
+
+        gotoXY(x, y); // Di chuyển đến vị trí
+
+        // 3. Chọn ký tự pháo hoa ngẫu nhiên
+        char sparkle;
+        int randCheck = rand() % 4;
+        if (randCheck == 0) sparkle = '*';
+        else if (randCheck == 1) sparkle = '+';
+        else if (randCheck == 2) sparkle = '.';
+        else sparkle = 'o';
+
+        cout << sparkle << flush; // flush để đảm bảo ký tự xuất hiện ngay
+
+        // 4. Dừng một chút
+        this_thread::sleep_for(chrono::milliseconds(15));
+    }
+
+    // 5. Dọn dẹp sau khi hiệu ứng kết thúc
+    system("cls"); // Xóa màn hình để chuẩn bị cho thông báo thắng
+    doiMau(7);     // Reset màu về mặc định
+}
 // =============== HÀM ĐỌC FILE ===============
 vector<pair<string, vector<string>>> doc_tu_tu_file(const string& ten_file) {
     ifstream file(ten_file);
@@ -422,7 +470,7 @@ void choi_game() {
                     doiMau(7);
                 }
                 continue; // quay lại đầu vòng lặp sau khi dùng gợi ý
-               }
+            }
             char ky_tu_doan = tolower(ki_tu_nhap[0]); // lấy ký tự duy nhất và chuyển về chữ thường
 
             // Kiểm tra có phải là chữ cái không
@@ -466,6 +514,7 @@ void choi_game() {
         if (so_chu_dung == tu_bi_mat.length()) {
             doiMau(10);
             amThanhThang();
+            hieu_ung_phao_hoa();
             inChamCham("\nChuc mung! Tu dung la: " + tu_bi_mat, 30);
             doiMau(7);
         }
