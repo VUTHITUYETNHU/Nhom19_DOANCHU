@@ -47,55 +47,68 @@ void amThanhThang() {
 void amThanhThua() {
     PlaySound(TEXT("lose.wav"), NULL, SND_FILENAME | SND_ASYNC);
 }
-// Hàm di chuyển con trỏ đến vị trí x, y trên màn hình console
-void gotoXY(int x, int y) {
-    COORD coord;
-    coord.X = x;
-    coord.Y = y;
-    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
-}
-// Hàm hiệu ứng pháo hoa
-void hieu_ung_phao_hoa() {
-    // Không xóa màn hình ngay lập tức để giữ lại hình vẽ người treo cổ
+void hieuUngPhaoHoa() {
+    // Mảng chứa các "frame" (khung hình) của pháo hoa
+    const vector<string> frame1 = {
+        "               ",
+        "               ",
+        "       .       ",
+        "               ",
+        "               "
+    };
+    const vector<string> frame2 = {
+        "       * ",
+        "      /|\\      ",
+        "     - * -     ",
+        "      \\|/      ",
+        "       * "
+    };
+    const vector<string> frame3 = {
+        "    .  * .    ",
+        "     \\ | /     ",
+        "   . - * - .   ",
+        "     / | \\     ",
+        "    .  * .    "
+    };
+    const vector<string> frame4 = { // Tàn pháo
+        "    .     .    ",
+        "       .       ",
+        "   .       .   ",
+        "      .        ",
+        "    .     .    "
+    };
 
-    srand(static_cast<unsigned int>(time(0))); // Khởi tạo seed ngẫu nhiên
-    auto startTime = chrono::steady_clock::now();
+    // Hàm trợ giúp (lambda) để in 1 frame
+    auto printFrame = [](const vector<string>& frame, int color) {
+        system("cls"); // Xóa màn hình
+        doiMau(10); // Màu xanh lá cho chữ
+        cout << "\n\n  CHUC MUNG BAN DA CHIEN THANG!\n\n";
 
-    // Giả định kích thước cửa sổ console (có thể điều chỉnh)
-    const int consoleWidth = 80;
-    const int consoleHeight = 25;
+        doiMau(color); // Đổi sang màu pháo hoa
+        for (const string& line : frame) {
+            // Thụt vào để pháo hoa ra giữa
+            cout << "               " << line << endl;
+        }
+        this_thread::sleep_for(chrono::milliseconds(200)); // Chờ 200ms
+        };
 
-    // Vòng lặp pháo hoa trong 3 giây
-    while (chrono::steady_clock::now() - startTime < chrono::seconds(3)) {
+    // Chạy 3 "quả" pháo hoa với 3 màu khác nhau
+    for (int i = 0; i < 3; ++i) {
+        // 9=Xanh, 10=Lục, 11=Lam, 12=Đỏ, 13=Tím, 14=Vàng
+        int color = 9 + (rand() % 6); // Chọn màu ngẫu nhiên (từ 9 đến 14)
 
-        // 1. Chọn màu ngẫu nhiên (chỉ các màu sáng)
-        int mau = 9 + (rand() % 7); // Từ 9 (Blue) đến 15 (White)
-        doiMau(mau);
-
-        // 2. Chọn vị trí ngẫu nhiên
-        int x = rand() % consoleWidth;
-        int y = rand() % consoleHeight;
-
-        gotoXY(x, y); // Di chuyển đến vị trí
-
-        // 3. Chọn ký tự pháo hoa ngẫu nhiên
-        char sparkle;
-        int randCheck = rand() % 4;
-        if (randCheck == 0) sparkle = '*';
-        else if (randCheck == 1) sparkle = '+';
-        else if (randCheck == 2) sparkle = '.';
-        else sparkle = 'o';
-
-        cout << sparkle << flush; // flush để đảm bảo ký tự xuất hiện ngay
-
-        // 4. Dừng một chút
-        this_thread::sleep_for(chrono::milliseconds(15));
+        printFrame(frame1, color);
+        printFrame(frame2, color);
+        printFrame(frame3, color);
+        printFrame(frame4, 8); // Màu xám cho tàn pháo
     }
 
-    // 5. Dọn dẹp sau khi hiệu ứng kết thúc
-    system("cls"); // Xóa màn hình để chuẩn bị cho thông báo thắng
-    doiMau(7);     // Reset màu về mặc định
+    // Dừng lại một chút
+    this_thread::sleep_for(chrono::milliseconds(500));
+    system("cls"); // Xóa màn hình để chuẩn bị in kết quả cuối
 }
+
+
 // =============== HÀM ĐỌC FILE ===============
 vector<pair<string, vector<string>>> doc_tu_tu_file(const string& ten_file) {
     ifstream file(ten_file);
@@ -399,6 +412,7 @@ bool su_dung_ngoi_sao_hy_vong(const string& tu_bi_mat, const string& tu_thuong, 
 
 // =============== HÀM CHƠI GAME CHÍNH ===============
 void choi_game() {
+    srand(static_cast<unsigned int>(time(0)));
     bool tiep_tuc = true;
 
     while (tiep_tuc) {
@@ -514,7 +528,7 @@ void choi_game() {
         if (so_chu_dung == tu_bi_mat.length()) {
             doiMau(10);
             amThanhThang();
-            hieu_ung_phao_hoa();
+            hieuUngPhaoHoa();
             inChamCham("\nChuc mung! Tu dung la: " + tu_bi_mat, 30);
             doiMau(7);
         }
